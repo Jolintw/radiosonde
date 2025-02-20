@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import metpy.calc as mpcalc
 from metpy.plots import SkewT
 from metpy.units import units
+from mypkgs.processor.numericalmethod import RightAngleInterpolater
 
 def skewTlogP(var):
     var = var.copy()
@@ -29,9 +30,15 @@ def skewTlogP(var):
     skew.plot(ds.isobaric, ds.ambient_temperature, 'r')
     skew.plot(ds.isobaric, ds.ambient_dew_point, 'g')
     skew.plot(ds.isobaric, ds.parcel_temperature.metpy.convert_units('degC'), 'black')
-    nbarb = 2
-    skew.plot_barbs(var['p'][::nbarb], var['u'][::nbarb], var['v'][::nbarb], xloc=1.07,plot_units=units.knots)
-
+    z_p100 = var["z"][np.argmin(np.abs(var['p'].magnitude - 100))]
+    barb_z_intv = 500 # meter
+    RAI = RightAngleInterpolater(X=var["z"], newX=np.arange(1, int(z_p100)//barb_z_intv+1) * barb_z_intv, equidistance=False)
+    p_barb = np.append([var["p"][0]], RAI.interpolate(var["p"]))
+    u_barb = np.append([var["u"][0]], RAI.interpolate(var["u"]))
+    v_barb = np.append([var["v"][0]], RAI.interpolate(var["v"]))
+    # nbarb = 2
+    # skew.plot_barbs(var['p'][::nbarb], var['u'][::nbarb], var['v'][::nbarb], xloc=1.07, plot_units=units.knots)
+    skew.plot_barbs(p_barb, u_barb, v_barb, xloc=1.07, plot_units=units.knots)
     # Add the relevant special lines
     pressure = np.arange(1000, 499, -50) * units('hPa')
     mixing_ratio = np.array([0.1, 0.2, 0.4, 0.6, 1, 1.5, 2, 3, 4,
@@ -46,4 +53,4 @@ def skewTlogP(var):
     skew.ax.set_ylim(1000, 100)
     skew.ax.set_xlim(-20, 40)
     skew.ax.text(-43,180,info, fontsize=ft-4)
-    return skew
+    return fig, skew
