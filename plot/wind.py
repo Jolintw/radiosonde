@@ -1,6 +1,6 @@
 
 import numpy as np
-from mypkgs.atmos_function import wswd_to_uv
+from atmospkg.calculation import wswd_to_uv
 from mypkgs.plotter.plotter import Plotter
 
 figsize = [7, 8]
