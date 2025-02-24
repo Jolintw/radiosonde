@@ -9,7 +9,10 @@ def skewTlogP(var):
     var = var.copy()
     var['p'] = var['p']*units.hPa
     var['T'] = var['T']*units.degC
-    var['Td'] = var['Td']*units.degC
+    if "Td" in var:
+        var['Td'] = var['Td']*units.degC
+    else:
+        var['Td'] = mpcalc.dewpoint_from_relative_humidity(var['T'], var['rh'] * units.percent)
     var['ws'] = var['ws']*units.meter/units.seconds
     var['wd'] = var['wd']*units.degree
     var['u'], var['v'] = mpcalc.wind_components(var['ws'], var['wd'])
