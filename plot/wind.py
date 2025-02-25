@@ -24,7 +24,7 @@ def uvplot_p(var, ylim = [1000, 600], xlim = [-5, 30], figsize = figsize):
 
 def plotwindline(Pt, var, yname, uvline = True, wsline = True):
     y = var[yname]
-    u, v = wswd_to_uv(var['ws'], var['wd'])
+    u, v = wswd_to_uv(var['ws'], var['wd'], wdunit="deg")
     if uvline:
         Pt.ax.plot(u, y, "r", label = "u")
         Pt.ax.plot(v, y, "b", label = "v")
